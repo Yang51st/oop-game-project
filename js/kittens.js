@@ -68,6 +68,14 @@ class Player {
     render(ctx) {
         ctx.drawImage(this.sprite, this.x, this.y);
     }
+    getX()
+    {
+        return this.x;
+    }
+    getY()
+    {
+        return this.y;
+    }
 }
 
 
@@ -199,7 +207,28 @@ class Engine {
 
     isPlayerDead() {
         // TODO: fix this function!
-        return false;
+        var flag=false;
+        var playX=this.player.x;
+        var playY=this.player.y;
+        this.enemies.forEach(function (enemy)
+        {
+            if(enemy.x==playX)
+            {
+                console.log(playY-enemy.y);
+                if((playY-enemy.y)<ENEMY_HEIGHT)
+                {
+                    flag=true;
+                }
+            }
+        });
+        if(flag)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }
 
