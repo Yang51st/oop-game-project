@@ -1,0 +1,41 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.highscore
+{
+    color:white;
+    font-size: 36px;
+    font-family: Calibri;
+    text-align: center;
+}
+
+html{
+    scroll-behavior: smooth;
+    background-color: pink;
+}
+
+canvas
+{
+    border-radius:25px;
+    position:absolute;
+    top:0px;
+    bottom:0px;
+    left:0px;
+    right:0px;
+    margin:auto;
+}
+
+.btn{
+    padding: 10px 35px;
+    background-color: transparent;
+    border: 1px solid beige;
+    color: white;
+    outline: none;
+    transition: .6s ease;
+    
+}
+

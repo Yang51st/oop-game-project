@@ -1,10 +1,12 @@
 // This section contains some game constants
-var GAME_WIDTH = 375;
+const highscore=document.querySelector('.highscore');
+let highscoreVal=0;
+var GAME_WIDTH = screen.width;
 var GAME_HEIGHT = 500;
 
 var ENEMY_WIDTH = 75;
 var ENEMY_HEIGHT = 156;
-var MAX_ENEMIES = 3;
+var MAX_ENEMIES = screen.width/ENEMY_WIDTH-4;
 
 var PLAYER_WIDTH = 75;
 var PLAYER_HEIGHT = 54;
@@ -12,6 +14,7 @@ var PLAYER_HEIGHT = 54;
 // These two constants keep us from using "magic numbers" in our code
 var LEFT_ARROW_CODE = 37;
 var RIGHT_ARROW_CODE = 39;
+var ENTER_BUTTON_CODE = 13;
 
 // These two constants allow us to DRY
 var MOVE_LEFT = 'left';
@@ -27,13 +30,19 @@ var images = {};
 
 
 
+class Entity {
+    render(ctx) {
+        ctx.drawImage(this.sprite, this.x, this.y);
+    }
+}
 
-
-class Enemy {
+class Enemy extends Entity{
     constructor(xPos) {
+        super();
         this.x = xPos;
         this.y = -ENEMY_HEIGHT;
         this.sprite = images['enemy.png'];
+        
 
         // Each enemy should have a different speed
         this.speed = Math.random() / 2 + 0.25;
@@ -42,17 +51,17 @@ class Enemy {
     update(timeDiff) {
         this.y = this.y + timeDiff * this.speed;
     }
-
-    render(ctx) {
-        ctx.drawImage(this.sprite, this.x, this.y);
-    }
+    
+    
 }
 
-class Player {
+class Player extends Entity{
     constructor() {
+        super();
         this.x = 2 * PLAYER_WIDTH;
         this.y = GAME_HEIGHT - PLAYER_HEIGHT - 10;
         this.sprite = images['player.png'];
+        
     }
 
     // This method is called by the game engine when left/right arrows are pressed
@@ -64,10 +73,6 @@ class Player {
             this.x = this.x + PLAYER_WIDTH;
         }
     }
-
-    render(ctx) {
-        ctx.drawImage(this.sprite, this.x, this.y);
-    }
     getX()
     {
         return this.x;
@@ -76,6 +81,8 @@ class Player {
     {
         return this.y;
     }
+
+    
 }
 
 
@@ -125,12 +132,11 @@ class Engine {
     addEnemy() {
         var enemySpots = GAME_WIDTH / ENEMY_WIDTH;
 
-        var enemySpot;
+        var enemySpot=Math.floor(Math.random() * enemySpots);
         // Keep looping until we find a free enemy spot at random
-        while (!enemySpot || this.enemies[enemySpot]) {
+        while ( this.enemies[enemySpot]) {
             enemySpot = Math.floor(Math.random() * enemySpots);
         }
-
         this.enemies[enemySpot] = new Enemy(enemySpot * ENEMY_WIDTH);
     }
 
@@ -147,9 +153,27 @@ class Engine {
             else if (e.keyCode === RIGHT_ARROW_CODE) {
                 this.player.move(MOVE_RIGHT);
             }
+            if (e.keyCode===ENTER_BUTTON_CODE) {
+                this.restarter();
+                console.log("HI");
+            }
         });
-
         this.gameLoop();
+    }
+
+    restarter() {
+        console.log("Restarted");
+        if(this.score>highscoreVal) {
+            highscoreVal=this.score;
+        }
+        highscore.innerHTML=highscoreVal.toString();
+        this.score=0;
+        this.lastFrame = Date.now();
+        this.enemies=[];
+        this.player=new Player();
+        this.setupEnemies();
+        this.gameLoop();
+
     }
 
     /*
@@ -174,6 +198,10 @@ class Engine {
         this.enemies.forEach(enemy => enemy.update(timeDiff));
 
         // Draw everything!
+        for(let i=0;i<screen.width/374;i++)
+        {
+            this.ctx.drawImage(images['stars.png'], i*374, 0);
+        }
         this.ctx.drawImage(images['stars.png'], 0, 0); // draw the star bg
         this.enemies.forEach(enemy => enemy.render(this.ctx)); // draw the enemies
         this.player.render(this.ctx); // draw the player
@@ -189,6 +217,7 @@ class Engine {
         // Check if player is dead
         if (this.isPlayerDead()) {
             // If they are dead, then it's game over!
+            console.log("END");
             this.ctx.font = 'bold 30px Impact';
             this.ctx.fillStyle = '#ffffff';
             this.ctx.fillText(this.score + ' GAME OVER', 5, 30);
@@ -210,11 +239,10 @@ class Engine {
         var flag=false;
         var playX=this.player.x;
         var playY=this.player.y;
-        this.enemies.forEach(function (enemy)
+        this.enemies.forEach((enemy) =>
         {
             if(enemy.x==playX)
             {
-                console.log(playY-enemy.y);
                 if((playY-enemy.y)<ENEMY_HEIGHT)
                 {
                     flag=true;
