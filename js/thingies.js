@@ -1,0 +1,1 @@
+export var highscore=document.querySelector('.highscore');

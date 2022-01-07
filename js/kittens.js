@@ -1,5 +1,5 @@
 // This section contains some game constants
-const highscore=document.querySelector('.highscore');
+import { highscore } from "./thingies.js";
 let highscoreVal=0;
 var GAME_WIDTH = screen.width;
 var GAME_HEIGHT = 500;
